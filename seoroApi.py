@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify, send_from_directory, session
+from flask import Flask, request, jsonify, send_from_directory, session, make_response
 import pandas as pd
 from rpy2 import robjects
 from rpy2.robjects import pandas2ri
@@ -21,17 +21,20 @@ if not os.path.exists(PLOT_FOLDER):
 @app.route('/upload', methods=['POST'])
 def upload():
     if 'log-file' not in request.files:
-        return jsonify(success=False)
-    
+        return jsonify(success=False, error="No file part")
+
     log_file = request.files['log-file']
-    
+
+    if log_file.filename == '':
+        return jsonify(success=False, error="No selected file")
+
     if log_file and allowed_file(log_file.filename):
         log_file_path = os.path.join(app.config['UPLOAD_FOLDER'], log_file.filename)
         log_file.save(log_file_path)
         session['log_file_path'] = log_file_path
         return jsonify(success=True)
     else:
-        return jsonify(success=False)
+        return jsonify(success=False, error="Invalid file type")
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
