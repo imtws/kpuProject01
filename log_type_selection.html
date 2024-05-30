@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그 파일 유형 선택</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>로그 파일 유형 선택</h1>
+        <form id="log-type-form">
+            <label for="log-type">로그 파일 유형을 선택하시오:</label>
+            <select id="log-type" name="log-type">
+                <option value="mysql">MySQL</option>
+                <option value="apache">Apache</option>
+                <option value="tomcat">Tomcat</option>
+            </select>
+            <button type="submit">분석하기</button>
+        </form>
+    </div>
+    <script>
+    document.getElementById('log-type-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const logType = document.getElementById('log-type').value;
+        const formData = new FormData();
+        formData.append('log-type', logType);
+        
+        fetch('/analyze', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = 'result.html';
+            } else {
+                alert('분석 불가: 업로드한 로그 데이터에 대해 각 셀 위치, 파일 정상 여부 등 확인 바랍니다.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('오류 발생: 분석 불가');
+        });
+    });
+    </script>
+</body>
+</html>
