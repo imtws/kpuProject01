@@ -17,5 +17,12 @@
         </form>
     </div>
     <script src="script.js"></script>
+    <script>
+        function displayFileName() {
+            const fileInput = document.getElementById('log-file');
+            const fileNameDiv = document.getElementById('file-name');
+            fileNameDiv.textContent = fileInput.files[0].name;
+        }
+    </script>
 </body>
 </html>
