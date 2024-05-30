@@ -88,7 +88,7 @@ def analyze_log(file_path, log_type):
     # R 코드로 ggplot2 그래프 생성
     r_plot_code = """
     library(ggplot2)
-    plot <- ggplot(df, aes(x = x_column, y = y_column)) + geom_point()
+    plot <- ggplot(df, aes(x = Sepal.Length, y = Sepal.Width)) + geom_point()
     plot_file <- tempfile(fileext = '.png')
     ggsave(plot_file, plot)
     plot_file
@@ -103,7 +103,10 @@ def analyze_log(file_path, log_type):
     os.rename(plot_file, plot_target_path)
     
     # 가상의 분석 결과 및 추천사항 생성
-    result = "Analysis result"
-    recommendations = "Recommendations based on analysis"
+    result = "Analysis result based on log type: " + log_type
+    recommendations = "Recommendations based on analysis of log type: " + log_type
     
     return result, recommendations, plot_filename
+
+if __name__ == '__main__':
+    app.run()
