@@ -82,5 +82,28 @@ def analyze_log(file_path, log_type):
     # Pandas DataFrame을 R DataFrame으로 변환
     r_df = pandas2ri.py2rpy(df)
     
+    # 예제 데이터 프레임
+    robjects.globalenv['df'] = r_df
+    
     # R 코드로 ggplot2 그래프 생성
-    plot_filename = f"{os.path.basename}"
+    r_plot_code = """
+    library(ggplot2)
+    plot <- ggplot(df, aes(x = x_column, y = y_column)) + geom_point()
+    plot_file <- tempfile(fileext = '.png')
+    ggsave(plot_file, plot)
+    plot_file
+    """
+    
+    # R 코드 실행
+    plot_file = robjects.r(r_plot_code)[0]
+
+    # 플롯 파일명을 얻기 위한 처리
+    plot_filename = os.path.basename(plot_file)
+    plot_target_path = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
+    os.rename(plot_file, plot_target_path)
+    
+    # 가상의 분석 결과 및 추천사항 생성
+    result = "Analysis result"
+    recommendations = "Recommendations based on analysis"
+    
+    return result, recommendations, plot_filename
