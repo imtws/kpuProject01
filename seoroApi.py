@@ -7,11 +7,14 @@ from rpy2.robjects.packages import importr
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
-UPLOAD_FOLDER = 'uploads'
-PLOT_FOLDER = 'plots'
+
+# 업로드 및 플롯 저장 디렉토리 설정
+UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads')
+PLOT_FOLDER = os.path.join(app.root_path, 'plots')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['PLOT_FOLDER'] = PLOT_FOLDER
 
+# 만약 디렉토리가 없으면 생성
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
