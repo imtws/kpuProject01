@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>서로데이터 로그 분석 시스템</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
     <div class="container">
@@ -16,7 +16,7 @@
             <button type="button" onclick="uploadFile()">로그 유형 선택</button>
         </form>
     </div>
-    <script src="script.js"></script>
+    <script src="../static/script.js"></script>
     <script>
         function displayFileName() {
             const fileInput = document.getElementById('log-file');

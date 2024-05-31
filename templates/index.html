@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>서로데이터 로그 분석 시스템</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+<div class="container">
+    <h1>서로데이터 로그 분석 시스템</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <label for="log-file">로그 파일 첨부</label>
+        <input type="file" id="log-file" name="log-file" accept=".csv" onchange="displayFileName()">
+        <div id="file-name"></div>
+        <button type="button" onclick="uploadFile()">로그 유형 선택</button>
+    </form>
+</div>
+<script src="../static/script.js"></script>
+<script>
+    function displayFileName() {
+        const fileInput = document.getElementById('log-file');
+        const fileNameDiv = document.getElementById('file-name');
+        fileNameDiv.textContent = fileInput.files[0].name;
+    }
+</script>
+</body>
+</html>

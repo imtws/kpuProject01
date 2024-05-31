@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify, send_from_directory, session, make_response
+from flask import Flask, request, jsonify, send_from_directory, session, make_response, render_template
 import pandas as pd
 from rpy2 import robjects
 from rpy2.robjects import pandas2ri
@@ -21,6 +21,37 @@ if not os.path.exists(UPLOAD_FOLDER):
 if not os.path.exists(PLOT_FOLDER):
     os.makedirs(PLOT_FOLDER)
 
+
+# HTML 랜더링 영역
+
+# 메인 페이지
+@app.route('/')
+def index():
+    result = session.get('result')
+    recommendations = session.get('recommendations')
+    plot_url = session.get('plot_url')
+    return render_template('index.html', result=result, recommendations=recommendations, plot_url=plot_url)
+
+# 로그 타입 선택 페이지
+@app.route('/log_type_selection')
+def log_type_selection():
+    result = session.get('result')
+    recommendations = session.get('recommendations')
+    plot_url = session.get('plot_url')
+    return render_template('log_type_selection.html', result=result, recommendations=recommendations, plot_url=plot_url)
+
+# 결과 페이지
+@app.route('/result')
+def show_result():
+    result = session.get('result')
+    recommendations = session.get('recommendations')
+    plot_url = session.get('plot_url')
+    return render_template('result.html', result=result, recommendations=recommendations, plot_url=plot_url)
+
+
+## API 영역
+
+# 업로드 API
 @app.route('/upload', methods=['POST'])
 def upload():
     if 'log-file' not in request.files:
@@ -39,6 +70,7 @@ def upload():
     else:
         return jsonify(success=False, error="Invalid file type")
 
+# 분석 API
 @app.route('/analyze', methods=['POST'])
 def analyze():
     log_file_path = session.get('log_file_path')
@@ -58,6 +90,7 @@ def analyze():
     else:
         return jsonify(success=False)
 
+# 로그 분석 결과 조회 API
 @app.route('/get_results', methods=['GET'])
 def get_results():
     result = session.get('result')
@@ -69,28 +102,33 @@ def get_results():
     else:
         return jsonify(success=False)
 
+# 그래프 파일 API
 @app.route('/plots/<filename>')
 def get_plot(filename):
     return send_from_directory(app.config['PLOT_FOLDER'], filename)
 
+# 함수 영역
+
+# 허용 파일 검사 함수
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv'}
 
+# 로그 분석 함수
 def analyze_log(file_path, log_type):
     pandas2ri.activate()
-    
+
     # R 라이브러리 및 함수 임포트
     ggplot2 = importr('ggplot2')
-    
+
     # CSV 파일을 Pandas DataFrame으로 읽기
     df = pd.read_csv(file_path)
-    
+
     # Pandas DataFrame을 R DataFrame으로 변환
     r_df = pandas2ri.py2rpy(df)
-    
+
     # 예제 데이터 프레임
     robjects.globalenv['df'] = r_df
-    
+
     # R 코드로 ggplot2 그래프 생성
     r_plot_code = """
     library(ggplot2)
@@ -99,7 +137,7 @@ def analyze_log(file_path, log_type):
     ggsave(plot_file, plot)
     plot_file
     """
-    
+
     # R 코드 실행
     plot_file = robjects.r(r_plot_code)[0]
 
@@ -107,12 +145,14 @@ def analyze_log(file_path, log_type):
     plot_filename = os.path.basename(plot_file)
     plot_target_path = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
     os.rename(plot_file, plot_target_path)
-    
+
     # 가상의 분석 결과 및 추천사항 생성
     result = "Analysis result based on log type: " + log_type
     recommendations = "Recommendations based on analysis of log type: " + log_type
-    
+
     return result, recommendations, plot_filename
 
+
+# Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
     app.run()

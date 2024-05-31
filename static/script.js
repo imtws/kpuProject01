@@ -20,7 +20,7 @@ function uploadFile() {
     })
     .then(data => {
         if (data.success) {
-            window.location.href = 'log_type_selection.html';
+            window.location.href = 'log_type_selection';
         } else {
             alert('파일 업로드 실패. 다시 시도하세요.');
         }

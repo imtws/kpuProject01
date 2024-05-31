@@ -23,7 +23,7 @@ def index():
     result = session.get('result')
     recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
-    return render_template('index.html', result=result, recommendations=recommendations, plot_url=plot_url)
+    return render_template('index.html.bak', result=result, recommendations=recommendations, plot_url=plot_url)
 
 @app.route('/upload', methods=['POST'])
 def upload():
