@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify, send_from_directory, session, make_response, render_template
+from flask import Flask, request, jsonify, send_from_directory, session, render_template
 import pandas as pd
 from rpy2 import robjects
 from rpy2.robjects import pandas2ri
@@ -76,6 +76,14 @@ def get_results():
 @app.route('/plots/<filename>')
 def get_plot(filename):
     return send_from_directory(app.config['PLOT_FOLDER'], filename)
+
+@app.route('/css/<path:filename>')
+def send_css(filename):
+    return send_from_directory('css', filename)
+
+@app.route('/scripts/<path:filename>')
+def send_scripts(filename):
+    return send_from_directory('scripts', filename)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv'}
