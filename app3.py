@@ -129,9 +129,9 @@ def analyze_log(file_path, log_type):
     log_data <- "{log_data}"
     
     # 텍스트 데이터를 데이터 프레임으로 변환
-    log_lines <- strsplit(log_data, "\\\\n")[[1]]
+    log_lines <- strsplit(log_data, "\\n")[[1]]
     log_df <- do.call(rbind, lapply(log_lines, function(line) {{
-      pattern <- '^(\\\\S+) - - \\\\[.*\\\\] "(\\\\S+) (\\\\S+) .*" (\\\\d+) \\\\d+ "(\\\\S+)"'
+      pattern <- '^(\\S+) - - \\[.*\\] "(\\S+) (\\S+) .*" (\\d+) \\d+ "(\\S+)"'
       matches <- regmatches(line, regexec(pattern, line))[[1]]
       data.frame(IP=matches[2], RequestType=matches[3], RequestPath=matches[4], StatusCode=matches[5], Referrer=matches[6], stringsAsFactors=FALSE)
     }}))
