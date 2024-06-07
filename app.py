@@ -116,15 +116,19 @@ def allowed_file(filename):
 # 로그 분석 함수
 def analyze_log(file_path, log_type):
     pandas2ri.activate()
-
-    # R 라이브러리 및 함수 임포트
-    ggplot2 = importr('ggplot2')
-
+    
     # CSV 파일을 Pandas DataFrame으로 읽기
     df = pd.read_csv(file_path)
 
     # Pandas DataFrame을 R DataFrame으로 변환
-    r_df = pandas2ri.py2rpy(df)
+    try:
+        r_df = pandas2ri.py2rpy(df)
+    except AttributeError as e:
+        print("DataFrame conversion error:", e)
+        return None, None, None
+
+    # R 라이브러리 및 함수 임포트
+    ggplot2 = importr('ggplot2')
 
     # 예제 데이터 프레임
     robjects.globalenv['df'] = r_df
@@ -151,7 +155,6 @@ def analyze_log(file_path, log_type):
     recommendations = "Recommendations based on analysis of log type: " + log_type
 
     return result, recommendations, plot_filename
-
 
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
