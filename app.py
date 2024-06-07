@@ -4,6 +4,7 @@ import pandas as pd
 from rpy2 import robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
+from rpy2.robjects.conversion import localconverter
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -120,11 +121,12 @@ def analyze_log(file_path, log_type):
     # CSV 파일을 Pandas DataFrame으로 읽기
     df = pd.read_csv(file_path)
 
-    # Pandas DataFrame을 R DataFrame으로 변환
     try:
-        r_df = pandas2ri.py2rpy(df)
-    except AttributeError as e:
-        print("DataFrame conversion error:", e)
+        # Pandas DataFrame을 R DataFrame으로 변환
+        with localconverter(robjects.default_converter + pandas2ri.converter):
+            r_df = robjects.conversion.py2rpy(df)
+    except Exception as e:
+        print(f"Error converting DataFrame to R DataFrame: {e}")
         return None, None, None
 
     # R 라이브러리 및 함수 임포트
