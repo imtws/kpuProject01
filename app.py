@@ -116,6 +116,9 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv'}
 
 # 로그 분석 함수
+import shutil
+
+# 로그 분석 함수
 def analyze_log(file_path, log_type):
     pandas2ri.activate()
     
@@ -152,18 +155,25 @@ def analyze_log(file_path, log_type):
     plot_filename = os.path.basename(plot_file)
     plot_target_path = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
 
-    # 파일 이동 (shutil.move() 사용)
+    # 파일 복사 (shutil.copy() 사용)
     try:
-        shutil.move(plot_file, plot_target_path)
+        shutil.copy(plot_file, plot_target_path)
     except Exception as e:
-        print(f"Error moving plot file: {e}")
+        print(f"Error copying plot file: {e}")
         return None, None, None
+
+    # 복사된 파일을 삭제
+    try:
+        os.remove(plot_file)
+    except Exception as e:
+        print(f"Error removing copied plot file: {e}")
 
     # 가상의 분석 결과 및 추천사항 생성
     result = "Analysis result based on log type: " + log_type
     recommendations = "Recommendations based on analysis of log type: " + log_type
 
     return result, recommendations, plot_filename
+
 
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
