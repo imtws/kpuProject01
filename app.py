@@ -5,6 +5,7 @@ from rpy2 import robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 from rpy2.robjects.conversion import localconverter
+import shutle
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -150,7 +151,13 @@ def analyze_log(file_path, log_type):
     # 플롯 파일명을 얻기 위한 처리
     plot_filename = os.path.basename(plot_file)
     plot_target_path = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
-    os.rename(plot_file, plot_target_path)
+
+    # 파일 이동 (shutil.move() 사용)
+    try:
+        shutil.move(plot_file, plot_target_path)
+    except Exception as e:
+        print(f"Error moving plot file: {e}")
+        return None, None, None
 
     # 가상의 분석 결과 및 추천사항 생성
     result = "Analysis result based on log type: " + log_type
