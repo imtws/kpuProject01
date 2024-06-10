@@ -5,12 +5,21 @@ document.getElementById('log-type-form').addEventListener('submit', function(eve
     const formData = new FormData();
     formData.append('log-type', logType);
     
-    // Assuming the file is stored in the session or other temporary storage between pages
     fetch('/analyze', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        // 응답의 content-type이 JSON인지 확인
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json();
+        } else {
+            return response.text().then(text => {
+                throw new Error('Unexpected response type: ' + contentType + '\n' + text);
+            });
+        }
+    })
     .then(data => {
         if (data.success) {
             displayResults(data);
@@ -21,7 +30,7 @@ document.getElementById('log-type-form').addEventListener('submit', function(eve
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('오류 발생: 분석 불가');
+        alert('오류 발생: 분석 불가\n' + error.message);
     });
 });
 

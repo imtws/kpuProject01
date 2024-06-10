@@ -4,6 +4,8 @@ import pandas as pd
 from rpy2 import robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
+from rpy2.robjects.conversion import localconverter
+import shutle
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -114,17 +116,25 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv'}
 
 # 로그 분석 함수
+import shutil
+
+# 로그 분석 함수
 def analyze_log(file_path, log_type):
     pandas2ri.activate()
-
-    # R 라이브러리 및 함수 임포트
-    ggplot2 = importr('ggplot2')
-
+    
     # CSV 파일을 Pandas DataFrame으로 읽기
     df = pd.read_csv(file_path)
 
-    # Pandas DataFrame을 R DataFrame으로 변환
-    r_df = pandas2ri.py2rpy(df)
+    try:
+        # Pandas DataFrame을 R DataFrame으로 변환
+        with localconverter(robjects.default_converter + pandas2ri.converter):
+            r_df = robjects.conversion.py2rpy(df)
+    except Exception as e:
+        print(f"Error converting DataFrame to R DataFrame: {e}")
+        return None, None, None
+
+    # R 라이브러리 및 함수 임포트
+    ggplot2 = importr('ggplot2')
 
     # 예제 데이터 프레임
     robjects.globalenv['df'] = r_df
@@ -144,7 +154,19 @@ def analyze_log(file_path, log_type):
     # 플롯 파일명을 얻기 위한 처리
     plot_filename = os.path.basename(plot_file)
     plot_target_path = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
-    os.rename(plot_file, plot_target_path)
+
+    # 파일 복사 (shutil.copy() 사용)
+    try:
+        shutil.copy(plot_file, plot_target_path)
+    except Exception as e:
+        print(f"Error copying plot file: {e}")
+        return None, None, None
+
+    # 복사된 파일을 삭제
+    try:
+        os.remove(plot_file)
+    except Exception as e:
+        print(f"Error removing copied plot file: {e}")
 
     # 가상의 분석 결과 및 추천사항 생성
     result = "Analysis result based on log type: " + log_type
