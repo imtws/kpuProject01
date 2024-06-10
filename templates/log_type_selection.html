@@ -34,7 +34,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                window.location.href = 'result.html';
+                window.location.href = 'result';
             } else {
                 alert('분석 불가: 업로드한 로그 데이터에 대해 각 셀 위치, 파일 정상 여부 등 확인 바랍니다.');
             }
