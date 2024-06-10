@@ -53,7 +53,6 @@ def show_result():
     pie_plot_url = session.get('pie_plot_url')
     return render_template('result.html', result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url)
 
-
 ## API 영역
 
 # 업로드 API
@@ -93,7 +92,7 @@ def analyze():
         session['recommendations'] = recommendations
         session['plot_url'] = plot_url
         session['pie_plot_url'] = pie_plot_url
-        return jsonify(success=True)
+        return jsonify(success=True, plot_url=plot_url, pie_plot_url=pie_plot_url)
     else:
         return jsonify(success=False)
 
