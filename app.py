@@ -144,7 +144,7 @@ def analyze_log(file_path, log_type):
     library(ggplot2)
     plot <- ggplot(df, aes(x = Sepal.Length, y = Sepal.Width)) + geom_point()
     plot_file <- tempfile(fileext = '.png')
-    ggsave(plot_file, plot)
+    ggsave(plot_file, plot, width = 5, height = 5)
     plot_file
     """
 
