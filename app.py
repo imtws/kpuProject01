@@ -149,7 +149,7 @@ def analyze_log(file_path, log_type):
             axis.text = element_text(size = 5)     # 축 텍스트 크기
         )
     plot_file <- tempfile(fileext = '.png')
-    ggsave(plot_file, plot, width = 2, height = 3)
+    ggsave(plot_file, plot, width = 5, height = 3)
     plot_file
     """
 
