@@ -5,7 +5,7 @@ from rpy2 import robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 from rpy2.robjects.conversion import localconverter
-import shutle
+#import shutle
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -142,9 +142,14 @@ def analyze_log(file_path, log_type):
     # R 코드로 ggplot2 그래프 생성
     r_plot_code = """
     library(ggplot2)
-    plot <- ggplot(df, aes(x = Sepal.Length, y = Sepal.Width)) + geom_point()
+    plot <- ggplot(df, aes(x = Sepal.Length, y = Sepal.Width)) + geom_point() + theme(
+            legend.text = element_text(size = 5),  # 범례 텍스트 크기
+            legend.title = element_text(size = 5), # 범례 제목 크기
+            axis.title = element_text(size = 5),   # 축 제목 크기
+            axis.text = element_text(size = 5)     # 축 텍스트 크기
+        )
     plot_file <- tempfile(fileext = '.png')
-    ggsave(plot_file, plot, width = 5, height = 5)
+    ggsave(plot_file, plot, width = 2, height = 3)
     plot_file
     """
 
