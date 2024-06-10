@@ -133,6 +133,9 @@ def analyze_log(file_path, log_type):
         print(f"Error converting DataFrame to R DataFrame: {e}")
         return None, None, None
 
+    # 열 값을 고유 번호로 변환
+    df['IP_code'] = df['IP'].astype('category').cat.codes
+
     # R 라이브러리 및 함수 임포트
     ggplot2 = importr('ggplot2')
 
