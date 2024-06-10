@@ -142,7 +142,7 @@ def analyze_log(file_path, log_type):
     # R 코드로 ggplot2 그래프 생성
     r_plot_code = """
     library(ggplot2)
-    plot <- ggplot(df, aes(x = Sepal.Length, y = Sepal.Width)) + geom_point() + theme(
+    plot <- ggplot(df, aes(x = IP, y = Code)) + geom_point() + theme(
             legend.text = element_text(size = 5),  # 범례 텍스트 크기
             legend.title = element_text(size = 5), # 범례 제목 크기
             axis.title = element_text(size = 5),   # 축 제목 크기
