@@ -32,7 +32,8 @@ def index():
     result = session.get('result')
     recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
-    return render_template('index.html', result=result, recommendations=recommendations, plot_url=plot_url)
+    pie_plot_url = session.get('pie_plot_url')
+    return render_template('index.html', result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url)
 
 # 로그 타입 선택 페이지
 @app.route('/log_type_selection')
@@ -40,7 +41,8 @@ def log_type_selection():
     result = session.get('result')
     recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
-    return render_template('log_type_selection.html', result=result, recommendations=recommendations, plot_url=plot_url)
+    pie_plot_url = session.get('pie_plot_url')
+    return render_template('log_type_selection.html', result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url)
 
 # 결과 페이지
 @app.route('/result')
@@ -48,7 +50,8 @@ def show_result():
     result = session.get('result')
     recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
-    return render_template('result.html', result=result, recommendations=recommendations, plot_url=plot_url)
+    pie_plot_url = session.get('pie_plot_url')
+    return render_template('result.html', result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url)
 
 
 ## API 영역
@@ -81,13 +84,15 @@ def analyze():
     
     log_type = request.form['log-type']
     
-    result, recommendations, plot_filename = analyze_log(log_file_path, log_type)
+    result, recommendations, plot_filename, pie_plot_filename = analyze_log(log_file_path, log_type)
     
-    if result and recommendations and plot_filename:
+    if result and recommendations and plot_filename and pie_plot_filename:
         plot_url = f'/plots/{plot_filename}'
+        pie_plot_url = f'/plots/{pie_plot_filename}'
         session['result'] = result
         session['recommendations'] = recommendations
         session['plot_url'] = plot_url
+        session['pie_plot_url'] = pie_plot_url
         return jsonify(success=True)
     else:
         return jsonify(success=False)
@@ -98,9 +103,10 @@ def get_results():
     result = session.get('result')
     recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
+    pie_plot_url = session.get('pie_plot_url')
     
-    if result and recommendations and plot_url:
-        return jsonify(success=True, result=result, recommendations=recommendations, plot_url=plot_url)
+    if result and recommendations and plot_url and pie_plot_url:
+        return jsonify(success=True, result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url)
     else:
         return jsonify(success=False)
 
@@ -128,13 +134,14 @@ def analyze_log(file_path, log_type):
             r_df = robjects.conversion.py2rpy(df)
     except Exception as e:
         print(f"Error converting DataFrame to R DataFrame: {e}")
-        return None, None, None
+        return None, None, None, None
 
     # 고유한 Code 값을 추출
     unique_codes = df['Code'].unique().tolist()
 
     # R 라이브러리 및 함수 임포트
     ggplot2 = importr('ggplot2')
+    dplyr = importr('dplyr')
 
     # 예제 데이터 프레임
     robjects.globalenv['df'] = r_df
@@ -150,29 +157,56 @@ def analyze_log(file_path, log_type):
                 axis.title = element_text(size = 5),   # 축 제목 크기
                 axis.text = element_text(size = 5)     # 축 텍스트 크기
             ) +
-            scale_x_discrete(drop=FALSE)
+            scale_x_discrete(drop=FALSE) +
+            labs(x = 'Status Code')
     plot_file <- tempfile(fileext = '.png')
     ggsave(plot_file, plot, width = 5, height = 3)
     plot_file
     """
 
+    # R 코드로 ggplot2 원 그래프 생성
+    r_pie_plot_code = """
+    library(ggplot2)
+    library(dplyr)
+    pie_data <- df %>%
+        count(Code) %>%
+        mutate(prop = n / sum(n) * 100) %>%
+        arrange(desc(Code))
+    
+    pie_plot <- ggplot(pie_data, aes(x = "", y = prop, fill = factor(Code))) +
+                geom_bar(width = 1, stat = "identity") +
+                coord_polar(theta = "y") +
+                theme_void() +
+                theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5))
+    
+    pie_plot_file <- tempfile(fileext = '.png')
+    ggsave(pie_plot_file, pie_plot, width = 5, height = 3)
+    pie_plot_file
+    """
+
     # R 코드 실행
     plot_file = robjects.r(r_plot_code)[0]
+    pie_plot_file = robjects.r(r_pie_plot_code)[0]
 
     # 플롯 파일명을 얻기 위한 처리
     plot_filename = os.path.basename(plot_file)
     plot_target_path = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
 
+    pie_plot_filename = os.path.basename(pie_plot_file)
+    pie_plot_target_path = os.path.join(app.config['PLOT_FOLDER'], pie_plot_filename)
+
     # 파일 복사 (shutil.copy() 사용)
     try:
         shutil.copy(plot_file, plot_target_path)
+        shutil.copy(pie_plot_file, pie_plot_target_path)
     except Exception as e:
         print(f"Error copying plot file: {e}")
-        return None, None, None
+        return None, None, None, None
 
     # 복사된 파일을 삭제
     try:
         os.remove(plot_file)
+        os.remove(pie_plot_file)
     except Exception as e:
         print(f"Error removing copied plot file: {e}")
 
@@ -180,7 +214,7 @@ def analyze_log(file_path, log_type):
     result = "Analysis result based on log type: " + log_type
     recommendations = "Recommendations based on analysis of log type: " + log_type
 
-    return result, recommendations, plot_filename
+    return result, recommendations, plot_filename, pie_plot_filename
 
 
 # Flask 실행 함수, 지우지 마십시오.
