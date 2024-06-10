@@ -5,7 +5,7 @@ from rpy2 import robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 from rpy2.robjects.conversion import localconverter
-#import shutle
+import shutil
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -116,9 +116,6 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv'}
 
 # 로그 분석 함수
-import shutil
-
-# 로그 분석 함수
 def analyze_log(file_path, log_type):
     pandas2ri.activate()
     
@@ -133,8 +130,8 @@ def analyze_log(file_path, log_type):
         print(f"Error converting DataFrame to R DataFrame: {e}")
         return None, None, None
 
-    # 열 값을 고유 번호로 변환
-    df['IP_code'] = df['IP'].astype('category').cat.codes
+    # 고유한 Code 값을 추출
+    unique_codes = df['Code'].unique().tolist()
 
     # R 라이브러리 및 함수 임포트
     ggplot2 = importr('ggplot2')
@@ -143,14 +140,17 @@ def analyze_log(file_path, log_type):
     robjects.globalenv['df'] = r_df
 
     # R 코드로 ggplot2 그래프 생성
-    r_plot_code = """
+    r_plot_code = f"""
     library(ggplot2)
-    plot <- ggplot(df, aes(x = IP_code, y = Code)) + geom_point() + theme(
-            legend.text = element_text(size = 5),  # 범례 텍스트 크기
-            legend.title = element_text(size = 5), # 범례 제목 크기
-            axis.title = element_text(size = 5),   # 축 제목 크기
-            axis.text = element_text(size = 5)     # 축 텍스트 크기
-        )
+    plot <- ggplot(df, aes(x = factor(Code, levels=c({','.join(map(str, unique_codes))})), y = IP)) + 
+            geom_point() + 
+            theme(
+                legend.text = element_text(size = 5),  # 범례 텍스트 크기
+                legend.title = element_text(size = 5), # 범례 제목 크기
+                axis.title = element_text(size = 5),   # 축 제목 크기
+                axis.text = element_text(size = 5)     # 축 텍스트 크기
+            ) +
+            scale_x_discrete(drop=FALSE)
     plot_file <- tempfile(fileext = '.png')
     ggsave(plot_file, plot, width = 5, height = 3)
     plot_file
