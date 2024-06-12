@@ -245,4 +245,7 @@ else:
     pie_plot_filename = os.path.basename(pie_plot_target_path)
     hist_plot_filename = os.path.basename(hist_plot_target_path)
 
-return result, recommendations, pie_plot_filename, hist_plot_filename
+if result is not None and recommendations is not None and pie_plot_filename is not None and hist_plot_filename is not None:
+    return result, recommendations, pie_plot_filename, hist_plot_filename
+else:
+    return None, None, None, None
