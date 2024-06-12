@@ -137,9 +137,6 @@ def analyze_log(file_path, log_type):
         print(f"Error converting DataFrame to R DataFrame: {e}")
         return None, None, None, None
 
-    # 이후 분석에 필요한 코드가 이어집니다.
-
-
     # 고유한 Code 값을 추출
     unique_codes = df['Code'].unique().tolist()
 
