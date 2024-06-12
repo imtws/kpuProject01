@@ -222,23 +222,28 @@ pie_plot_target_path = os.path.join(app.config['PLOT_FOLDER'], pie_plot_filename
 hist_plot_filename = os.path.basename(hist_plot_file)
 hist_plot_target_path = os.path.join(app.config['PLOT_FOLDER'], hist_plot_filename)
 
-# 파일 복사 (shutil.copy() 사용)
-try:
-    shutil.copy(pie_plot_file, pie_plot_target_path)
-    shutil.copy(hist_plot_file, hist_plot_target_path)
-except Exception as e:
-    print(f"Error copying plot file: {e}")
-    return None, None, None, None
-else:
+    # 파일 복사 (shutil.copy() 사용)
+    try:
+        shutil.copy(plot_file, plot_target_path)
+        shutil.copy(pie_plot_file, pie_plot_target_path)
+    except Exception as e:
+        print(f"Error copying plot file: {e}")
+        return None, None, None, None
+
     # 복사된 파일을 삭제
     try:
+        os.remove(plot_file)
         os.remove(pie_plot_file)
-        os.remove(hist_plot_file)
     except Exception as e:
         print(f"Error removing copied plot file: {e}")
 
-# 가상의 분석 결과 및 추천사항 생성
-result = "Analysis result based on log type: " + log_type
-recommendations = "Recommendations based on analysis of log type: " + log_type
+    # 가상의 분석 결과 및 추천사항 생성
+    result = "Analysis result based on log type: " + log_type
+    recommendations = "Recommendations based on analysis of log type: " + log_type
 
-return result, recommendations, pie_plot_filename, hist_plot_filename
+    return result, recommendations, plot_filename, pie_plot_filename
+
+
+# Flask 실행 함수, 지우지 마십시오.
+if __name__ == '__main__':
+    app.run()
