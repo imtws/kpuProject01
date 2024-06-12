@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 piePlotImage.src = data.pie_plot_url;
                 resultDiv.classList.remove('hidden');
                 errorMessageDiv.classList.add('hidden');
+                
+                // Initially show only the first graph
+                showGraph(0);
             } else {
                 resultDiv.classList.add('hidden');
                 errorMessageDiv.classList.remove('hidden');
             }
-
-            // Initially show only the first graph
-            showGraph(0);
         })
         .catch(error => {
             console.error('Error:', error);

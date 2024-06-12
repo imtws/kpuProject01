@@ -48,3 +48,9 @@ label, input, button {
 #graph-navigation button {
     margin: 0 10px;
 }
+
+.centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
