@@ -6,8 +6,6 @@ from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 from rpy2.robjects.conversion import localconverter
 import shutil
-import warnings
-warnings.filterwarnings("ignore", category=FutureWarning, module="rpy2.robjects.pandas2ri")
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -129,9 +127,6 @@ def analyze_log(file_path, log_type):
     df = pd.read_csv(file_path)
 
     try:
-        # Code 열을 정수형으로 변환
-        df['Code'] = df['Code'].astype(int)
-        
         # Pandas DataFrame을 R DataFrame으로 변환
         with localconverter(robjects.default_converter + pandas2ri.converter):
             r_df = robjects.conversion.py2rpy(df)
@@ -141,29 +136,6 @@ def analyze_log(file_path, log_type):
 
     # 고유한 Code 값을 추출
     unique_codes = df['Code'].unique().tolist()
-
-    # 코드 설명 딕셔너리 정의
-    code_descriptions = {
-        301: "301: 컨텐츠가 영구적으로 이동되어 발생",
-        302: "302: 컨텐츠가 일시적으로 이동되어 발생",
-        303: "303: 서버에서 GET 메소드를 처리하여 다른 URL에서 요청된 정보를 가져올 수 있도록 응답",
-        400: "400: 잘못된 요청을 보냈을 때 발생",
-        401: "401: 인증이 필요한 리소스에 잘못된 인증으로 접근 시도하였을 때 발생",
-        403: "403: 서버에서 요청을 거부하였을 때 발생",
-        404: "404: 요청한 리소스를 찾을 수 없을 때 발생",
-        408: "408: 요청한 시간이 기본 요청 시간보다 오래 걸릴 때 발생",
-        500: "500: 서버 내부적으로 시스템 상 오류가 있을 때 발생",
-        502: "502: 게이트웨이가 연결된 서버에서 응답을 잘못 받을 때 발생",
-        503: "503: 서비스를 사용할 수 없을 때 발생",
-        504: "504: 게이트웨이가 연결된 서버에서 응답을 가져올 수 없을 때 발생"
-    }
-
-    # 코드 범주 설명 딕셔너리 정의
-    code_categories = {
-        300: "300번 대 코드는 비정상적인 리다이렉트로 인해 발생한다.",
-        400: "400번 대 코드는 클라이언트에서 요청이 올바르지 않게 인입되어 발생한다.",
-        500: "500번 대 코드는 서버에서 응답할 수 없어 발생한다."
-    }
 
     # R 라이브러리 및 함수 임포트
     ggplot2 = importr('ggplot2')
@@ -214,9 +186,9 @@ def analyze_log(file_path, log_type):
     plot_file = robjects.r(r_plot_code)[0]
     pie_plot_file = robjects.r(r_pie_plot_code)[0]
 
-    # 플롯 파일명을 변경하여 저장
+    # 플롯 파일명을 얻기 위한 처리
     plot_filename = os.path.basename(plot_file)
-    pie_plot_filename = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
+    plot_target_path = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
 
     pie_plot_filename = os.path.basename(pie_plot_file)
     pie_plot_target_path = os.path.join(app.config['PLOT_FOLDER'], pie_plot_filename)
