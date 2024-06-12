@@ -127,12 +127,18 @@ def analyze_log(file_path, log_type):
     df = pd.read_csv(file_path)
 
     try:
+        # Code 열을 정수형으로 변환
+        df['Code'] = df['Code'].astype(int)
+        
         # Pandas DataFrame을 R DataFrame으로 변환
         with localconverter(robjects.default_converter + pandas2ri.converter):
             r_df = robjects.conversion.py2rpy(df)
     except Exception as e:
         print(f"Error converting DataFrame to R DataFrame: {e}")
         return None, None, None, None
+
+    # 이후 분석에 필요한 코드가 이어집니다.
+
 
     # 고유한 Code 값을 추출
     unique_codes = df['Code'].unique().tolist()
