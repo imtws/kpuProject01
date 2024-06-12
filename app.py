@@ -6,6 +6,8 @@ from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 from rpy2.robjects.conversion import localconverter
 import shutil
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning, module="rpy2.robjects.pandas2ri")
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
