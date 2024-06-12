@@ -132,7 +132,7 @@ def analyze_log(file_path, log_type):
             r_df = robjects.conversion.py2rpy(df)
     except Exception as e:
         print(f"Error converting DataFrame to R DataFrame: {e}")
-        return None, None, None, None
+        return None, None, None
 
     # 고유한 Code 값을 추출
     unique_codes = df['Code'].unique().tolist()
@@ -174,7 +174,7 @@ def analyze_log(file_path, log_type):
         shutil.copy(plot_file, plot_target_path)
     except Exception as e:
         print(f"Error copying plot file: {e}")
-        return None, None, None, None
+        return None, None, None
 
     # 복사된 파일을 삭제
     try:
