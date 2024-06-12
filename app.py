@@ -196,7 +196,7 @@ pie_plot <- ggplot(pie_data, aes(x = "", y = n, fill = factor(Code))) +
             labs(fill = "Code")  # 범례 이름을 Code로 변경
 
 pie_plot_file <- tempfile(fileext = '.png')
-ggsave(pie_plot_file, pie_plot, width = 10, height = 6, dpi = 300)  # 크기와 해상도를 설정
+ggsave(pie_plot_file, pie_plot, width = 5, height = 3, dpi = 300)  # 크기와 해상도를 설정
 pie_plot_file
 
 # 히스토그램 생성
