@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify, send_from_directory, session, make_response, render_template
+from flask import Flask, request, jsonify, send_from_directory, session, render_template
 import pandas as pd
 from rpy2 import robjects
 from rpy2.robjects import pandas2ri
@@ -22,7 +22,6 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 if not os.path.exists(PLOT_FOLDER):
     os.makedirs(PLOT_FOLDER)
-
 
 # HTML 랜더링 영역
 
@@ -172,9 +171,10 @@ def analyze_log(file_path, log_type):
         mutate(prop = n / sum(n) * 100) %>%
         arrange(desc(Code))
     
-    pie_plot <- ggplot(pie_data, aes(x = "", y = prop, fill = factor(Code))) +
+    pie_plot <- ggplot(pie_data, aes(x = "", y = prop, fill = Code)) +
                 geom_bar(width = 1, stat = "identity") +
                 coord_polar(theta = "y") +
+                geom_text(aes(label = sprintf("%.1f%%", prop)), position = position_stack(vjust = 0.5), size = 2) + # 수치 표시 추가
                 theme_void() +
                 theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5))
     
