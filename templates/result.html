@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,10 +15,18 @@
             <div id="recommendations"></div>
             <div id="plot">
                 <h2>분석 그래프</h2>
-                <img id="plot-image" src="" alt="Plot Image">
-                <h2>원 그래프</h2>
-                <img id="pie-plot-image" src="" alt="Pie Plot Image">
+                <div id="graph-container" class="centered">
+                    <img id="plot-image" src="" alt="Plot Image" class="graph">
+                    <img id="pie-plot-image" src="" alt="Pie Plot Image" class="graph">
+                </div>
+                <div id="graph-navigation">
+                    <button id="prev-graph">이전 그래프</button>
+                    <button id="next-graph">다음 그래프</button>
+                </div>
             </div>
+        </div>
+        <div id="error-message" class="hidden">
+            <p>결과를 불러오는 중 오류가 발생했습니다.</p>
         </div>
     </div>
     <script src="../static/result.js"></script>

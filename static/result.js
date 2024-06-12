@@ -1,4 +1,3 @@
-// result.js
 document.addEventListener('DOMContentLoaded', function() {
     // Load data from session or API and display results
     fetch('/get_results')
@@ -18,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 piePlotImage.src = data.pie_plot_url;
                 resultDiv.classList.remove('hidden');
                 errorMessageDiv.classList.add('hidden');
+                
+                // Initially show only the first graph
+                showGraph(0);
             } else {
                 resultDiv.classList.add('hidden');
                 errorMessageDiv.classList.remove('hidden');
@@ -28,4 +30,24 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('result').classList.add('hidden');
             document.getElementById('error-message').classList.remove('hidden');
         });
+
+    const graphs = document.querySelectorAll('.graph');
+    let currentGraphIndex = 0;
+
+    document.getElementById('prev-graph').addEventListener('click', function() {
+        showGraph(currentGraphIndex - 1);
+    });
+
+    document.getElementById('next-graph').addEventListener('click', function() {
+        showGraph(currentGraphIndex + 1);
+    });
+
+    function showGraph(index) {
+        if (index < 0 || index >= graphs.length) {
+            return;
+        }
+        graphs[currentGraphIndex].style.display = 'none';
+        graphs[index].style.display = 'block';
+        currentGraphIndex = index;
+    }
 });
