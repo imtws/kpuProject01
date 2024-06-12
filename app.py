@@ -212,12 +212,8 @@ def analyze_log(file_path, log_type):
 
     # R 코드 실행
     plot_files = robjects.r(r_pie_plot_code)
-    if len(plot_files) >= 2:
-        pie_plot_file = plot_files[0]
-        hist_plot_file = plot_files[1]
-    else:
-        # 반환된 값이 예상대로 아니면 처리하는 코드를 추가할 수 있습니다.
-        print("Unexpected return value from R code")
+    pie_plot_file = plot_files[0]
+    hist_plot_file = plot_files[1]
 
     # 플롯 파일명을 얻기 위한 처리
     pie_plot_filename = os.path.basename(pie_plot_file)
