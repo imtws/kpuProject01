@@ -1,18 +1,24 @@
 body {
     font-family: Arial, sans-serif;
+    background-color: #e0f7fa;
+    color: #007bff;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
     width: 80%;
-    margin: 0 auto;
+    margin: 50px auto;
     padding: 20px;
+    background-color: #ffffff;
     border: 1px solid #ccc;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
     text-align: center;
+    color: #007bff;
 }
 
 form {
@@ -21,12 +27,49 @@ form {
     align-items: center;
 }
 
-label, input, button {
+label {
     margin: 10px 0;
+    font-weight: bold;
+}
+
+input[type="file"] {
+    margin: 10px 0;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 #file-name {
     margin-top: 10px;
+    font-style: italic;
+}
+
+button.styled-button {
+    margin: 20px 0;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+button.styled-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+button.styled-button:active {
+    background-color: #004080;
+}
+
+.select-box {
+    margin: 10px 0;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 .hidden {
@@ -43,10 +86,6 @@ label, input, button {
     display: flex;
     justify-content: center;
     margin-top: 10px;
-}
-
-#graph-navigation button {
-    margin: 0 10px;
 }
 
 .centered {
