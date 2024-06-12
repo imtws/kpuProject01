@@ -162,71 +162,16 @@ def analyze_log(file_path, log_type):
     plot_file
     """
 
-    # R 코드로 ggplot2 원 그래프 및 히스토그램 생성
-    r_pie_plot_code = """
-    library(ggplot2)
-    library(dplyr)
-    pie_data <- df %>%
-        count(Code) %>%
-        arrange(desc(n))
-        
-    top_code <- head(pie_data$Code, 1)
-    top_code_desc <- switch(top_code,
-        "300" = "비정상적인 리다이렉트",
-        "301" = "컨텐츠가 영구적으로 이동되어 발생",
-        "302" = "컨텐츠가 일시적으로 이동되어 발생",
-        "303" = "서버에서 GET 메소드를 처리하여 다른 URL에서 요청된 정보를 가져올 수 있도록 응답",
-        "400" = "잘못된 요청을 보냈을 때 발생",
-        "401" = "인증이 필요한 리소스에 잘못된 인증으로 접근 시도하였을 때 발생",
-        "403" = "서버에서 요청을 거부하였을 때 발생",
-        "404" = "요청한 리소스를 찾을 수 없을 때 발생",
-        "408" = "요청한 시간이 기본 요청 시간보다 오래 걸릴 때 발생",
-        "500" = "서버 내부적으로 시스템 상 오류가 있을 때 발생",
-        "502" = "게이트웨이가 연결된 서버에서 응답을 잘못 받을 때 발생",
-        "503" = "서비스를 사용할 수 없을 때 발생",
-        "504" = "게이트웨이가 연결된 서버에서 응답을 가져올 수 없을 때 발생"
-    )
-
-    pie_plot <- ggplot(pie_data, aes(x = "", y = n, fill = factor(Code))) +
-                geom_bar(width = 1, stat = "identity") +
-                coord_polar(theta = "y") +
-                geom_text(aes(label = n), position = position_stack(vjust = 0.5), size = 3, color = "white") + # 수치 표시 및 색상 변경
-                theme_void() +
-                theme(legend.text = element_text(size = 5), legend.title = element_text(size = 5)) +
-                labs(fill = "Code")  # 범례 이름을 Code로 변경
-
-    pie_plot_file <- tempfile(fileext = '.png')
-    ggsave(pie_plot_file, pie_plot, width = 5, height = 3, dpi = 300)  # 크기와 해상도를 설정
-    pie_plot_file
-
-    # 히스토그램 생성
-    hist_plot <- ggplot(df, aes(x = Code)) +
-                geom_histogram(fill = "skyblue", color = "black", bins = 15) +
-                labs(x = "Code", y = "Count") +
-                theme_minimal()
-
-    hist_plot_file <- tempfile(fileext = '.png')
-    ggsave(hist_plot_file, hist_plot, width = 10, height = 6, dpi = 300)
-    hist_plot_file
-    """
-
-    # R 코드 실행
+    # R 코드 실행하여 플롯 파일 생성
     plot_file = robjects.r(r_plot_code)[0]
-    pie_plot_file = plot_files[0]
-    hist_plot_file = plot_files[1]
-
 
     # 플롯 파일명을 얻기 위한 처리
-    pie_plot_filename = os.path.basename(pie_plot_file)
-    pie_plot_target_path = os.path.join(app.config['PLOT_FOLDER'], pie_plot_filename)
-
-    hist_plot_filename = os.path.basename(hist_plot_file)
-    hist_plot_target_path = os.path.join(app.config['PLOT_FOLDER'], hist_plot_filename)
+    plot_filename = os.path.basename(plot_file)
+    plot_target_path = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
 
     # 파일 복사 (shutil.copy() 사용)
     try:
         shutil.copy(plot_file, plot_target_path)
-        shutil.copy(pie_plot_file, pie_plot_target_path)
     except Exception as e:
         print(f"Error copying plot file: {e}")
         return None, None, None, None
@@ -234,7 +179,6 @@ def analyze_log(file_path, log_type):
     # 복사된 파일을 삭제
     try:
         os.remove(plot_file)
-        os.remove(pie_plot_file)
     except Exception as e:
         print(f"Error removing copied plot file: {e}")
 
@@ -242,8 +186,7 @@ def analyze_log(file_path, log_type):
     result = "Analysis result based on log type: " + log_type
     recommendations = "Recommendations based on analysis of log type: " + log_type
 
-    return result, recommendations, plot_filename, pie_plot_filename
-
+    return result, recommendations, plot_filename
 
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
