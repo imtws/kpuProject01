@@ -1,4 +1,3 @@
-// result.js
 document.addEventListener('DOMContentLoaded', function() {
     // Load data from session or API and display results
     fetch('/get_results')
@@ -22,10 +21,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultDiv.classList.add('hidden');
                 errorMessageDiv.classList.remove('hidden');
             }
+
+            // Initially show only the first graph
+            showGraph(0);
         })
         .catch(error => {
             console.error('Error:', error);
             document.getElementById('result').classList.add('hidden');
             document.getElementById('error-message').classList.remove('hidden');
         });
+
+    const graphs = document.querySelectorAll('.graph');
+    let currentGraphIndex = 0;
+
+    document.getElementById('prev-graph').addEventListener('click', function() {
+        showGraph(currentGraphIndex - 1);
+    });
+
+    document.getElementById('next-graph').addEventListener('click', function() {
+        showGraph(currentGraphIndex + 1);
+    });
+
+    function showGraph(index) {
+        if (index < 0 || index >= graphs.length) {
+            return;
+        }
+        graphs[currentGraphIndex].classList.add('hidden');
+        graphs[index].classList.remove('hidden');
+        currentGraphIndex = index;
+    }
 });

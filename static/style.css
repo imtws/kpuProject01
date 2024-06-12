@@ -28,3 +28,23 @@ label, input, button {
 #file-name {
     margin-top: 10px;
 }
+
+.hidden {
+    display: none;
+}
+
+.graph {
+    display: none;
+    width: 100%;
+    height: auto;
+}
+
+#graph-navigation {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#graph-navigation button {
+    margin: 0 10px;
+}
