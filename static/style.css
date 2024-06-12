@@ -35,7 +35,7 @@ label, input, button {
 
 .graph {
     display: none;
-    width: 100%;
+    max-width: 100%;
     height: auto;
 }
 

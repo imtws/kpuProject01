@@ -46,8 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (index < 0 || index >= graphs.length) {
             return;
         }
-        graphs[currentGraphIndex].classList.add('hidden');
-        graphs[index].classList.remove('hidden');
+        graphs[currentGraphIndex].style.display = 'none';
+        graphs[index].style.display = 'block';
         currentGraphIndex = index;
     }
 });
