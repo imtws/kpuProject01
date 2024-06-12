@@ -24,6 +24,12 @@
         event.preventDefault();
         
         const logType = document.getElementById('log-type').value;
+        
+        if (logType !== 'apache') {
+            alert('분석 불가: Apache 로그 파일 유형만 지원됩니다.');
+            return;
+        }
+        
         const formData = new FormData();
         formData.append('log-type', logType);
         
