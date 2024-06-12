@@ -228,17 +228,21 @@ try:
     shutil.copy(hist_plot_file, hist_plot_target_path)
 except Exception as e:
     print(f"Error copying plot file: {e}")
-    return None, None, None, None
-
-# 복사된 파일을 삭제
-try:
-    os.remove(pie_plot_file)
-    os.remove(hist_plot_file)
-except Exception as e:
-    print(f"Error removing copied plot file: {e}")
-
-# 가상의 분석 결과 및 추천사항 생성
-result = "Analysis result based on log type: " + log_type
-recommendations = f"Recommendations based on analysis of log type: {log_type}\n\n{top_code_desc}"
+    result = None
+    recommendations = None
+    pie_plot_filename = None
+    hist_plot_filename = None
+else:
+    # 복사된 파일을 삭제
+    try:
+        os.remove(pie_plot_file)
+        os.remove(hist_plot_file)
+    except Exception as e:
+        print(f"Error removing copied plot file: {e}")
+    # 가상의 분석 결과 및 추천사항 생성
+    result = "Analysis result based on log type: " + log_type
+    recommendations = f"Recommendations based on analysis of log type: {log_type}\n\n{top_code_desc}"
+    pie_plot_filename = os.path.basename(pie_plot_target_path)
+    hist_plot_filename = os.path.basename(hist_plot_target_path)
 
 return result, recommendations, pie_plot_filename, hist_plot_filename
