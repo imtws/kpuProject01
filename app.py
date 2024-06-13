@@ -162,16 +162,50 @@ def analyze_log(file_path, log_type):
     plot_file
     """
 
+    # 원 그래프 생성 코드
+    r_pie_code = f"""
+    library(dplyr)
+    pie_data <- df %>% count(Code) %>% mutate(pct = n / sum(n) * 100)
+    pie_plot <- ggplot(pie_data, aes(x = "", y = pct, fill = factor(Code))) +
+                geom_bar(stat = "identity", width = 1) +
+                coord_polar(theta = "y") +
+                theme_void() +
+                labs(title = 'Pie Chart of Codes')
+    pie_file <- tempfile(fileext = '.png')
+    ggsave(pie_file, pie_plot, width = 10, height = 6, dpi = 300)
+    pie_file
+    """
+
+    # 히스토그램 생성 코드
+    r_hist_code = f"""
+    hist_plot <- ggplot(df, aes(x = Code)) + 
+                 geom_histogram(binwidth = 1, fill = 'blue', color = 'black') + 
+                 theme_minimal() + 
+                 labs(title = 'Histogram of Codes', x = 'Code', y = 'Frequency')
+    hist_file <- tempfile(fileext = '.png')
+    ggsave(hist_file, hist_plot, width = 10, height = 6, dpi = 300)
+    hist_file
+    """
+
     # R 코드 실행하여 플롯 파일 생성
     plot_file = robjects.r(r_plot_code)[0]
+    pie_file = robjects.r(r_pie_code)[0]
+    hist_file = robjects.r(r_hist_code)[0]
 
     # 플롯 파일명을 얻기 위한 처리
     plot_filename = os.path.basename(plot_file)
+    pie_filename = os.path.basename(pie_file)
+    hist_filename = os.path.basename(hist_file)
+
     plot_target_path = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
+    pie_target_path = os.path.join(app.config['PLOT_FOLDER'], pie_filename)
+    hist_target_path = os.path.join(app.config['PLOT_FOLDER'], hist_filename)
 
     # 파일 복사 (shutil.copy() 사용)
     try:
         shutil.copy(plot_file, plot_target_path)
+        shutil.copy(pie_file, pie_target_path)
+        shutil.copy(hist_file, hist_target_path)
     except Exception as e:
         print(f"Error copying plot file: {e}")
         return None, None, None
@@ -179,6 +213,8 @@ def analyze_log(file_path, log_type):
     # 복사된 파일을 삭제
     try:
         os.remove(plot_file)
+        os.remove(pie_file)
+        os.remove(hist_file)
     except Exception as e:
         print(f"Error removing copied plot file: {e}")
 
