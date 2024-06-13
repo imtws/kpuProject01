@@ -104,6 +104,7 @@ def get_results():
     recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
     pie_plot_url = session.get('pie_plot_url')
+
     
     if result and recommendations and plot_url and pie_plot_url:
         return jsonify(success=True, result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url)
@@ -224,7 +225,7 @@ def analyze_log(file_path, log_type):
     result = "Analysis result based on log type: " + log_type
     recommendations = "Recommendations based on analysis of log type: " + log_type
 
-    return result, recommendations, plot_filename, 1, 1
+    return result, recommendations, plot_filename, pie_plot_filename, hist_filename
 
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
