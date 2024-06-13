@@ -128,12 +128,13 @@ def analyze():
     if not log_type:
         return jsonify(success=False, error="No log type provided")
     
-    plot_filename, pie_filename, hist_filename = analyze_log(log_file_path, log_type)
+    error_code_info, plot_filename, pie_filename, hist_filename = analyze_log(log_file_path, log_type)
     
-    if plot_filename and pie_filename and hist_filename:
+    if error_code_info and plot_filename and pie_filename and hist_filename:
         plot_url = f'/plots/{plot_filename}'
         pie_plot_url = f'/plots/{pie_filename}'
         histogram_url = f'/plots/{hist_filename}'
+        session['error_code_info'] = error_code_info
         session['plot_url'] = plot_url
         session['pie_plot_url'] = pie_plot_url
         session['histogram_url'] = histogram_url
@@ -141,15 +142,17 @@ def analyze():
     else:
         return jsonify(success=False, error="Analysis failed")
 
+
 # 로그 분석 결과 조회 API
 @app.route('/get_results', methods=['GET'])
 def get_results():
+    error_code_info = session.get('error_code_info')
     plot_url = session.get('plot_url')
     pie_plot_url = session.get('pie_plot_url')
     histogram_url = session.get('histogram_url')  
     
-    if plot_url and pie_plot_url and histogram_url:
-        return jsonify(success=True, error_code_descriptions=error_code_descriptions, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
+    if error_code_info and plot_url and pie_plot_url and histogram_url:
+        return jsonify(success=True, error_code_info=error_code_info, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
     else:
         return jsonify(success=False)
 
@@ -266,6 +269,15 @@ def analyze_log(file_path, log_type):
         os.remove(hist_file)
     except Exception as e:
         print(f"Error removing copied plot file: {e}")
+    
+    # 가장 많이 발생한 에러 코드에 대한 설명과 조치 방법 가져오기
+    description = error_code_descriptions.get(str(most_common_code), {}).get('description', 'No description available')
+    action = error_code_descriptions.get(str(most_common_code), {}).get('action', 'No action available')
+    error_code_info = {
+        'code': most_common_code,
+        'description': description,
+        'action': action
+    }
 
     return plot_filename, pie_filename, hist_filename
 
