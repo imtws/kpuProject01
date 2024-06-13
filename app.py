@@ -29,6 +29,14 @@ error_code_descriptions = {
     '302': {
         'description': '사용자가 요청한 리소스가 일시적으로 다른 URL로 이동되었을 때 발생합니다.',
         'action': '서버 내 리다이렉션 설정을 확인해보는 것이 좋습니다.'
+    },
+    '404': {
+        'description': '요청한 페이지를 찾을 수 없습니다.',
+        'action': 'URL이 정확한지 확인하고, 필요한 경우 서버 설정을 수정합니다.'
+    },
+    '500': {
+        'description': '서버 내부 오류가 발생했습니다.',
+        'action': '서버 로그를 확인하고, 코드나 서버 설정을 점검합니다.'
     }
     # 추가적인 에러 코드 설명을 여기에 추가할 수 있습니다.
 }
@@ -54,7 +62,7 @@ def upload_csv():
         result = f"현재 {most_common_code} 에러 코드가 가장 많이 조회되었으며, 해당 코드는 {description}"
         recommendations = f"조치 방법으로는 {action}"
 
-        return jsonify(success=True, result=result, recommendations=recommendations, plot_url='plot.png', histogram_url='histogram.png', pie_plot_url='pie_plot.png')
+        return jsonify(success=True, result=result, error_code_description=description, recommendations=recommendations, plot_url='plot.png', histogram_url='histogram.png', pie_plot_url='pie_plot.png')
 
     return jsonify(success=False, message='File processing error')
 
@@ -143,7 +151,7 @@ def get_results():
     histogram_url = session.get('histogram_url')  
     
     if result and recommendations and plot_url and pie_plot_url and histogram_url:
-        return jsonify(success=True, result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
+        return jsonify(success=True, result=result, error_code_description=error_code_descriptions, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
     else:
         return jsonify(success=False)
 
@@ -258,10 +266,10 @@ def analyze_log(file_path, log_type):
         print(f"Error removing copied plot file: {e}")
 
     # 가상의 분석 결과 및 추천사항 생성
-    result = "Analysis result based on log type: " + log_type
-    recommendations = "Recommendations based on analysis of log type: " + log_type
+    #result = "Analysis result based on log type: " + log_type
+    #recommendations = "Recommendations based on analysis of log type: " + log_type
 
-    return result, recommendations, plot_filename, pie_filename, hist_filename
+    #return result, recommendations, plot_filename, pie_filename, hist_filename
 
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
