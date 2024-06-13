@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Load data from session or API and display results
+    // Fetch results from the server
     fetch('/get_results')
         .then(response => response.json())
         .then(data => {
@@ -17,9 +17,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 plotImage.src = data.plot_url;
                 histogramImage.src = data.histogram_url;
                 piePlotImage.src = data.pie_plot_url;
+
+                // 콘솔 로그 추가
+                console.log('Plot URL:', data.plot_url);
+                console.log('Histogram URL:', data.histogram_url);
+                console.log('Pie Plot URL:', data.pie_plot_url);
+
                 resultDiv.classList.remove('hidden');
                 errorMessageDiv.classList.add('hidden');
-                
+
                 // Initially show only the first graph
                 showGraph(0);
             } else {
@@ -55,4 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initially hide all graphs
     graphs.forEach(graph => graph.style.display = 'none');
+
+    // Show the first graph initially
+    if (graphs.length > 0) {
+        graphs[0].style.display = 'block';
+    }
 });
