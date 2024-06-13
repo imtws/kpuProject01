@@ -277,6 +277,33 @@ def allowed_file(filename):
 def get_plot(filename):
     return send_from_directory(app.config['PLOT_FOLDER'], filename)
 
+import pandas as pd
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    file = request.files['file']
+    if not file:
+        return jsonify({"success": False, "error": "No file uploaded"}), 400
+    
+    try:
+        df = pd.read_csv(file)
+        most_queried_ip = df['IP'].value_counts().idxmax()
+        ip_query_count = df['IP'].value_counts().max()
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+    return jsonify({
+        "success": True,
+        "most_queried_ip": most_queried_ip,
+        "ip_query_count": ip_query_count
+    })
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
     app.run()
