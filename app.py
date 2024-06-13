@@ -231,7 +231,7 @@ def analyze_log(file_path, log_type):
         hist_file = robjects.r(r_hist_code)[0]
     except Exception as e:
         print(f"Error generating plots: {e}")
-        return None, None, None, None
+        return None, None, None
 
     # 플롯 파일명을 얻기 위한 처리
     plot_filename = os.path.basename(plot_file)
@@ -257,7 +257,7 @@ def analyze_log(file_path, log_type):
         os.remove(pie_file)
         os.remove(hist_file)
     except Exception as e:
-        print(f"Error removing copied plot file: {e}")
+        print(f"Error removing temporary plot file: {e}")
 
     # 가장 많이 발생한 에러 코드에 대한 설명과 조치 방법 가져오기
     description = error_code_descriptions.get(str(most_common_code), {}).get('description', 'No description available')
@@ -272,6 +272,10 @@ def analyze_log(file_path, log_type):
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv'}
+
+@app.route('/plots/<filename>')
+def get_plot(filename):
+    return send_from_directory(app.config['PLOT_FOLDER'], filename)
 
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
