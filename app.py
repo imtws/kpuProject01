@@ -134,7 +134,7 @@ def analyze_log(file_path, log_type):
             r_df = robjects.conversion.py2rpy(df)
     except Exception as e:
         print(f"Error converting DataFrame to R DataFrame: {e}")
-        return None, None, None, None, None
+        return None, None, None
 
     # 고유한 Code 값을 추출
     unique_codes = df['Code'].unique().tolist()
@@ -210,7 +210,7 @@ def analyze_log(file_path, log_type):
         shutil.copy(hist_file, hist_target_path)
     except Exception as e:
         print(f"Error copying plot file: {e}")
-        return None, None, None, None, None
+        return None, None, None
 
     # 복사된 파일을 삭제
     try:
@@ -224,4 +224,8 @@ def analyze_log(file_path, log_type):
     result = "Analysis result based on log type: " + log_type
     recommendations = "Recommendations based on analysis of log type: " + log_type
 
-    return result, recommendations, plot_filename, hist_filename, pie_filename
+    return result, recommendations, plot_filename, 1, 1
+
+# Flask 실행 함수, 지우지 마십시오.
+if __name__ == '__main__':
+    app.run()
