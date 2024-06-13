@@ -298,23 +298,31 @@ def get_plot(filename):
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-def extract_ip_from_csv(file_path):
+import re
+
+def extract_ip_addresses_from_file(file_path):
+    ip_addresses = []
     try:
-        df = pd.read_csv(file_path)
-        if 'IP' not in df.columns:
-            return None, "No 'IP' column found in CSV"
-        
-        # IP 주소를 추출하여 리스트로 반환
-        ip_addresses = []
-        for ip in df['IP']:
-            # 간단한 정규 표현식을 사용하여 IP 주소 추출
-            match = re.search(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', str(ip))
-            if match:
-                ip_addresses.append(match.group())
-        
+        with open(file_path, 'r') as file:
+            for line in file:
+                # 정규 표현식을 사용하여 IP 주소 추출
+                ip_match = re.search(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', line)
+                if ip_match:
+                    ip_addresses.append(ip_match.group())
         return ip_addresses, None
     except Exception as e:
         return None, str(e)
+
+# 파일 경로
+file_path = 'Apache_Log_Data.csv'
+
+# IP 주소 추출
+ip_addresses, error = extract_ip_addresses_from_file(file_path)
+if ip_addresses:
+    print("Extracted IP addresses:", ip_addresses)
+else:
+    print("Error:", error)
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
