@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const piePlotImage = document.getElementById('pie-plot-image');
             const resultDiv = document.getElementById('result');
             const errorMessageDiv = document.getElementById('error-message');
+            const mostQueriedIpDiv = document.getElementById('most_queried_ip');
 
             if (data.success) {
                 const errorCodeInfo = data.error_code_info;
@@ -18,6 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 plotImage.src = data.plot_url;
                 histogramImage.src = data.histogram_url;
                 piePlotImage.src = data.pie_plot_url;
+
+                mostQueriedIpDiv.innerHTML = `
+                    <p><strong>가장 많이 조회된 IP:</strong> ${data.most_queried_ip} (${data.ip_query_count}회)</p>
+                `;
 
                 resultDiv.classList.remove('hidden');
                 errorMessageDiv.classList.add('hidden');
