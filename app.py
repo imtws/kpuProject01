@@ -32,6 +32,7 @@ def index():
     recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
     pie_plot_url = session.get('pie_plot_url')
+    histogram_url = session.get('histogram_url')
     return render_template('index.html', result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url)
 
 # 로그 타입 선택 페이지
@@ -41,6 +42,7 @@ def log_type_selection():
     recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
     pie_plot_url = session.get('pie_plot_url')
+    histogram_url = session.get('histogram_url')
     return render_template('log_type_selection.html', result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url)
 
 # 결과 페이지
@@ -50,7 +52,8 @@ def show_result():
     recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
     pie_plot_url = session.get('pie_plot_url')
-    return render_template('result.html', result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url)
+    histogram_url = session.get('histogram_url')
+    return render_template('result.html', result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
 
 ## API 영역
 
@@ -82,18 +85,18 @@ def analyze():
     
     log_type = request.form['log-type']
     
-    result, recommendations, plot_filename, hist_filename, pie_plot_filename = analyze_log(log_file_path, log_type)
+    result, recommendations, plot_filename, pie_filename = analyze_log(log_file_path, log_type), hist_filename
     
-    if result and recommendations and plot_filename and hist_filename and pie_plot_filename:
+    if result and recommendations and plot_filename and pie_filename and hist_filename:
         plot_url = f'/plots/{plot_filename}'
+        pie_plot_url = f'/plots/{pie_filename}'
         histogram_url = f'/plots/{hist_filename}'
-        pie_plot_url = f'/plots/{pie_plot_filename}'
         session['result'] = result
         session['recommendations'] = recommendations
         session['plot_url'] = plot_url
-        session['histogram_url'] = histogram_url
         session['pie_plot_url'] = pie_plot_url
-        return jsonify(success=True, plot_url=plot_url, histogram_url=histogram_url, pie_plot_url=pie_plot_url)
+        session['histogram_url'] = histogram_url
+        return jsonify(success=True, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
     else:
         return jsonify(success=False)
 
@@ -104,10 +107,10 @@ def get_results():
     recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
     pie_plot_url = session.get('pie_plot_url')
-
+    histogram_url = session.get('histogram_url')  
     
-    if result and recommendations and plot_url and pie_plot_url:
-        return jsonify(success=True, result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url)
+    if result and recommendations and plot_url and pie_plot_url and histogram_url:
+        return jsonify(success=True, result=result, recommendations=recommendations, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
     else:
         return jsonify(success=False)
 
@@ -225,7 +228,7 @@ def analyze_log(file_path, log_type):
     result = "Analysis result based on log type: " + log_type
     recommendations = "Recommendations based on analysis of log type: " + log_type
 
-    return result, recommendations, plot_filename, pie_plot_filename, hist_filename
+    return result, recommendations, plot_filename, pie_filename, hist_filename
 
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
