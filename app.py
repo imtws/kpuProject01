@@ -82,16 +82,18 @@ def analyze():
     
     log_type = request.form['log-type']
     
-    result, recommendations, plot_filename, pie_plot_filename = analyze_log(log_file_path, log_type)
+    result, recommendations, plot_filename, hist_filename, pie_plot_filename = analyze_log(log_file_path, log_type)
     
-    if result and recommendations and plot_filename and pie_plot_filename:
+    if result and recommendations and plot_filename and hist_filename and pie_plot_filename:
         plot_url = f'/plots/{plot_filename}'
+        histogram_url = f'/plots/{hist_filename}'
         pie_plot_url = f'/plots/{pie_plot_filename}'
         session['result'] = result
         session['recommendations'] = recommendations
         session['plot_url'] = plot_url
+        session['histogram_url'] = histogram_url
         session['pie_plot_url'] = pie_plot_url
-        return jsonify(success=True, plot_url=plot_url, pie_plot_url=pie_plot_url)
+        return jsonify(success=True, plot_url=plot_url, histogram_url=histogram_url, pie_plot_url=pie_plot_url)
     else:
         return jsonify(success=False)
 
