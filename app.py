@@ -157,13 +157,6 @@ def get_results():
 
 
 # 그래프 파일 API
-@app.route('/plots/<filename>')
-def get_plot(filename):
-    return send_from_directory(app.config['PLOT_FOLDER'], filename)
-
-# 함수 영역
-
-# 허용 파일 검사 함수
 def analyze_log(file_path, log_type):
     pandas2ri.activate()
     
@@ -179,7 +172,7 @@ def analyze_log(file_path, log_type):
         return None, None, None, None
 
     # 가장 많이 조회된 Code 값을 추출
-    most_common_code = df['Code'].value_counts().idxmax()
+    most_common_code = int(df['Code'].value_counts().idxmax())
 
     # R 라이브러리 및 함수 임포트
     ggplot2 = importr('ggplot2')
@@ -238,7 +231,7 @@ def analyze_log(file_path, log_type):
         hist_file = robjects.r(r_hist_code)[0]
     except Exception as e:
         print(f"Error generating plots: {e}")
-        return None, None, None
+        return None, None, None, None
 
     # 플롯 파일명을 얻기 위한 처리
     plot_filename = os.path.basename(plot_file)
