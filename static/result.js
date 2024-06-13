@@ -13,16 +13,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (data.success) {
                 const errorCodeInfo = data.error_code_info;
-                errorCodeDescriptionsDiv.innerHTML = `
-                    <p><strong>${errorCodeInfo.code}</strong>: ${errorCodeInfo.description} - ${errorCodeInfo.action}</p>
-                `;
-                plotImage.src = data.plot_url;
-                histogramImage.src = data.histogram_url;
-                piePlotImage.src = data.pie_plot_url;
 
-                mostQueriedIpDiv.innerHTML = `
-                    <p><strong>가장 많이 조회된 IP:</strong> ${data.most_queried_ip} (${data.ip_query_count}회)</p>
-                `;
+                if (errorCodeInfo) {
+                    errorCodeDescriptionsDiv.innerHTML = `
+                        <p><strong>${errorCodeInfo.code}</strong>: ${errorCodeInfo.description} - ${errorCodeInfo.action}</p>
+                    `;
+                }
+
+                if (data.plot_url) {
+                    plotImage.src = data.plot_url;
+                }
+
+                if (data.histogram_url) {
+                    histogramImage.src = data.histogram_url;
+                }
+
+                if (data.pie_plot_url) {
+                    piePlotImage.src = data.pie_plot_url;
+                }
+
+                if (data.most_queried_ip && data.ip_query_count !== undefined) {
+                    mostQueriedIpDiv.innerHTML = `
+                        <p><strong>가장 많이 조회된 IP:</strong> ${data.most_queried_ip} (${data.ip_query_count}회)</p>
+                    `;
+                }
 
                 resultDiv.classList.remove('hidden');
                 errorMessageDiv.classList.add('hidden');
