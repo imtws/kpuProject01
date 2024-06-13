@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             const analysisResultDiv = document.getElementById('analysis-result');
+            const errorCodeDescriptionsDiv = document.getElementById('error_code_descriptions');
             const recommendationsDiv = document.getElementById('recommendations');
             const plotImage = document.getElementById('plot-image');
             const histogramImage = document.getElementById('hist-plot-image');
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (data.success) {
                 analysisResultDiv.innerHTML = `<p>${data.result}</p>`;
+                errorCodeDescriptionsDiv.innerHTML = `<p>${data.error_code_descriptions}</p>`;
                 recommendationsDiv.innerHTML = `<p>${data.recommendations}</p>`;
                 plotImage.src = data.plot_url;
                 histogramImage.src = data.histogram_url;
