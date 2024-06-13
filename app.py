@@ -181,13 +181,13 @@ def analyze_log(file_path, log_type):
     ggsave(pie_file, pie_plot, width = 10, height = 6, dpi = 300)
     pie_file
     """
-
     # 히스토그램 생성 코드
     r_hist_code = f"""
-    hist_plot <- ggplot(df, aes(x = factor(Code, levels=c({','.join(map(str, unique_codes))})), y = IP)) + 
-                 geom_histogram(binwidth = 1, fill = 'blue', color = 'black') + 
-                 theme_minimal() + 
-                 labs(title = 'Histogram of Codes', x = 'Code', y = 'Frequency')
+    library(ggplot2)
+    hist_plot <- ggplot(df, aes(x = factor(Code, levels=c({','.join(map(str, unique_codes))})))) + 
+                geom_histogram(stat="count", fill = 'blue', color = 'black') + 
+                theme_minimal() + 
+                labs(title = 'Histogram of Codes', x = 'Code', y = 'Frequency')
     hist_file <- tempfile(fileext = '.png')
     ggsave(hist_file, hist_plot, width = 10, height = 6, dpi = 300)
     hist_file
