@@ -268,3 +268,7 @@ def analyze_log(file_path, log_type):
         print(f"Error removing copied plot file: {e}")
 
     return plot_filename, pie_filename, hist_filename
+
+# Flask 실행 함수, 지우지 마십시오.
+if __name__ == '__main__':
+    app.run()
