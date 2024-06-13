@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const analysisResultDiv = document.getElementById('analysis-result');
             const recommendationsDiv = document.getElementById('recommendations');
             const plotImage = document.getElementById('plot-image');
+            const histogramImage = document.getElementById('hist-plot-image');
             const piePlotImage = document.getElementById('pie-plot-image');
             const resultDiv = document.getElementById('result');
             const errorMessageDiv = document.getElementById('error-message');
@@ -14,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 analysisResultDiv.innerHTML = `<p>${data.result}</p>`;
                 recommendationsDiv.innerHTML = `<p>${data.recommendations}</p>`;
                 plotImage.src = data.plot_url;
+                histogramImage.src = data.histogram_url;
                 piePlotImage.src = data.pie_plot_url;
                 resultDiv.classList.remove('hidden');
                 errorMessageDiv.classList.add('hidden');
@@ -50,4 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         graphs[index].style.display = 'block';
         currentGraphIndex = index;
     }
+
+    // Initially hide all graphs
+    graphs.forEach(graph => graph.style.display = 'none');
 });
