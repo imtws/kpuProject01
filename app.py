@@ -204,7 +204,7 @@ def analyze_log(file_path, log_type):
     hist_filename = os.path.basename(hist_file)
 
     plot_target_path = os.path.join(app.config['PLOT_FOLDER'], plot_filename)
-    pie_target_path = os.path.join(app.config['PLOTs_FOLDER'], pie_filename)
+    pie_target_path = os.path.join(app.config['PLOT_FOLDER'], pie_filename)
     hist_target_path = os.path.join(app.config['PLOT_FOLDER'], hist_filename)
 
     # 파일 복사 (shutil.copy() 사용)
