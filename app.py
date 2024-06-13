@@ -295,33 +295,46 @@ def allowed_file(filename):
 def get_plot(filename):
     return send_from_directory(app.config['PLOT_FOLDER'], filename)
 
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def extract_ip_from_csv(file_path):
+    try:
+        df = pd.read_csv(file_path)
+        if 'IP' not in df.columns:
+            return None, "No 'IP' column found in CSV"
+        
+        # IP 주소를 추출하여 리스트로 반환
+        ip_addresses = []
+        for ip in df['IP']:
+            # 간단한 정규 표현식을 사용하여 IP 주소 추출
+            match = re.search(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', str(ip))
+            if match:
+                ip_addresses.append(match.group())
+        
+        return ip_addresses, None
+    except Exception as e:
+        return None, str(e)
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    file = request.files['file']
-    if not file:
-        return jsonify({"success": False, "error": "No file uploaded"}), 400
-    
-    try:
-        df = pd.read_csv(file)
-        if 'IP' not in df.columns:
-            return jsonify({"success": False, "error": "No IP column in CSV"}), 400
-        
-        # IP 컬럼의 값이 빈 값인 경우 제거
-        df = df.dropna(subset=['IP'])
-        
-        if df.empty:
-            return jsonify({"success": False, "error": "No valid IP addresses in CSV"}), 400
-        
-        most_queried_ip = df['IP'].value_counts().idxmax()
-        ip_query_count = df['IP'].value_counts().max()
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    if 'file' not in request.files:
+        return jsonify({"success": False, "error": "No file part"}), 400
 
-    return jsonify({
-        "success": True,
-        "most_queried_ip": most_queried_ip,
-        "ip_query_count": ip_query_count
-    })
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"success": False, "error": "No selected file"}), 400
+
+    if file:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(file_path)
+        
+        # CSV 파일에서 IP 주소 추출
+        ip_addresses, error = extract_ip_from_csv(file_path)
+        if ip_addresses is not None:
+            return jsonify({"success": True, "ip_addresses": ip_addresses}), 200
+        else:
+            return jsonify({"success": False, "error": error}), 500
 
 @app.route('/check_session')
 def check_session():
