@@ -151,19 +151,20 @@ def analyze():
     else:
         return jsonify(success=False, error="Analysis failed")
 
-# 로그 분석 결과 조회 API
+# 분석 결과 조회 API에 가장 많이 조회된 IP 정보를 추가합니다.
 @app.route('/get_results', methods=['GET'])
 def get_results():
     error_code_info = session.get('error_code_info')
     plot_url = session.get('plot_url')
     pie_plot_url = session.get('pie_plot_url')
-    histogram_url = session.get('histogram_url')  
+    histogram_url = session.get('histogram_url')
+    most_queried_ip = session.get('most_queried_ip')  # 가장 많이 조회된 IP 정보를 가져옵니다.
+    ip_query_count = session.get('ip_query_count')  # 해당 IP의 조회 횟수를 가져옵니다.
     
-    if error_code_info and plot_url and pie_plot_url and histogram_url:
-        return jsonify(success=True, error_code_info=error_code_info, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
+    if error_code_info and plot_url and pie_plot_url and histogram_url and most_queried_ip and ip_query_count:
+        return jsonify(success=True, error_code_info=error_code_info, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url, most_queried_ip=most_queried_ip, ip_query_count=ip_query_count)
     else:
         return jsonify(success=False)
-
 
 # 그래프 파일 API
 def analyze_log(file_path, log_type):
