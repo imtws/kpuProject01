@@ -63,6 +63,14 @@ def upload_csv():
         description = error_code_descriptions.get(str(most_common_code), {}).get('description', 'No description available')
         action = error_code_descriptions.get(str(most_common_code), {}).get('action', 'No action available')
 
+        session['error_code_info'] = {
+            'code': most_common_code,
+            'description': description,
+            'action': action
+        }
+        session['most_queried_ip'] = most_queried_ip
+        session['ip_query_count'] = ip_query_count
+
         result = {
             'success': True,
             'error_code_info': {
