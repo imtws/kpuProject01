@@ -85,7 +85,7 @@ def analyze():
     
     log_type = request.form['log-type']
     
-    result, recommendations, plot_filename, pie_filename = analyze_log(log_file_path, log_type), hist_filename
+    result, recommendations, plot_filename, pie_filename, hist_filename = analyze_log(log_file_path, log_type)
     
     if result and recommendations and plot_filename and pie_filename and hist_filename:
         plot_url = f'/plots/{plot_filename}'
