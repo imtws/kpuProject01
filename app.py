@@ -285,6 +285,15 @@ def upload_file():
     
     try:
         df = pd.read_csv(file)
+        if 'IP' not in df.columns:
+            return jsonify({"success": False, "error": "No IP column in CSV"}), 400
+        
+        # IP 컬럼의 값이 빈 값인 경우 제거
+        df = df.dropna(subset=['IP'])
+        
+        if df.empty:
+            return jsonify({"success": False, "error": "No valid IP addresses in CSV"}), 400
+        
         most_queried_ip = df['IP'].value_counts().idxmax()
         ip_query_count = df['IP'].value_counts().max()
     except Exception as e:
