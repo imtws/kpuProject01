@@ -277,9 +277,6 @@ def allowed_file(filename):
 def get_plot(filename):
     return send_from_directory(app.config['PLOT_FOLDER'], filename)
 
-import pandas as pd
-from flask import Flask, jsonify, request
-
 @app.route('/upload', methods=['POST'])
 def upload_file():
     file = request.files['file']
@@ -299,8 +296,8 @@ def upload_file():
         "ip_query_count": ip_query_count
     })
 
-if __name__ == "__main__":
-    app.run(debug=True)
+#if __name__ == "__main__":
+#    app.run(debug=True)
 
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
