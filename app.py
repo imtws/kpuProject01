@@ -52,19 +52,28 @@ def upload_csv():
 
     if file:
         df = pd.read_csv(file)
-        if 'Code' not in df.columns:
-            return jsonify(success=False, message='No Code column in CSV')
+        if 'Code' not in df.columns or 'IP' not in df.columns:
+            return jsonify(success=False, message='No Code or IP column in CSV')
+
+        # 가장 많이 조회된 IP 분석
+        most_queried_ip = df['IP'].value_counts().idxmax()
+        ip_query_count = df['IP'].value_counts().max()
 
         most_common_code = df['Code'].value_counts().idxmax()
         description = error_code_descriptions.get(str(most_common_code), {}).get('description', 'No description available')
         action = error_code_descriptions.get(str(most_common_code), {}).get('action', 'No action available')
 
-        result = f"현재 {most_common_code} 에러 코드가 가장 많이 조회되었으며, 해당 코드는 {description}"
-        recommendations = f"조치 방법으로는 {action}"
-
-        return jsonify(success=True, result=result, error_code_description=description, recommendations=recommendations, plot_url='plot.png', histogram_url='histogram.png', pie_plot_url='pie_plot.png')
-
-    return jsonify(success=False, message='File processing error')
+        result = {
+            'success': True,
+            'error_code_info': {
+                'code': most_common_code,
+                'description': description,
+                'action': action
+            },
+            'most_queried_ip': most_queried_ip,
+            'ip_query_count': ip_query_count
+        }
+        return jsonify(result)
 
 # 메인 페이지
 @app.route('/')
