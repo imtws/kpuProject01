@@ -11,9 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const errorMessageDiv = document.getElementById('error-message');
 
             if (data.success) {
-                errorCodeDescriptionsDiv.innerHTML = Object.entries(data.error_code_descriptions).map(([code, desc]) => 
-                    `<p><strong>${code}</strong>: ${desc.description} - ${desc.action}</p>`
-                ).join('');
+                const errorCodeInfo = data.error_code_info;
+                errorCodeDescriptionsDiv.innerHTML = `
+                    <p><strong>${errorCodeInfo.code}</strong>: ${errorCodeInfo.description} - ${errorCodeInfo.action}</p>
+                `;
                 plotImage.src = data.plot_url;
                 histogramImage.src = data.histogram_url;
                 piePlotImage.src = data.pie_plot_url;
