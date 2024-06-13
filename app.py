@@ -158,11 +158,11 @@ def get_results():
     plot_url = session.get('plot_url')
     pie_plot_url = session.get('pie_plot_url')
     histogram_url = session.get('histogram_url')
-    most_queried_ip = session.get('most_queried_ip')
-    ip_query_count = session.get('ip_query_count')
+    most_queried_ip = session.get('most_queried_ip')  # 이 부분 추가
+    ip_query_count = session.get('ip_query_count')  # 이 부분 추가
     
-    if error_code_info and plot_url and pie_plot_url and histogram_url and most_queried_ip and ip_query_count:
-        return jsonify(success=True, error_code_info=error_code_info, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url, most_queried_ip=most_queried_ip, ip_query_count=ip_query_count)
+    if error_code_info and plot_url and pie_plot_url and histogram_url:  # 이 부분 수정
+        return jsonify(success=True, error_code_info=error_code_info, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url, most_queried_ip=most_queried_ip, ip_query_count=ip_query_count)  # 이 부분 수정
     else:
         return jsonify(success=False, error="Results not found in session")
 
