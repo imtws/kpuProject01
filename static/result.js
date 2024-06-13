@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 histogramImage.src = data.histogram_url;
                 piePlotImage.src = data.pie_plot_url;
 
-                // 콘솔 로그 추가
                 console.log('Plot URL:', data.plot_url);
                 console.log('Histogram URL:', data.histogram_url);
                 console.log('Pie Plot URL:', data.pie_plot_url);
