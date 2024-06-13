@@ -122,36 +122,34 @@ def upload():
 def analyze():
     log_file_path = session.get('log_file_path')
     if not log_file_path:
-        return jsonify(success=False)
+        return jsonify(success=False, error="No log file found in session")
     
-    log_type = request.form['log-type']
+    log_type = request.form.get('log-type')
+    if not log_type:
+        return jsonify(success=False, error="No log type provided")
     
-    result, recommendations, plot_filename, pie_filename, hist_filename = analyze_log(log_file_path, log_type)
+    plot_filename, pie_filename, hist_filename = analyze_log(log_file_path, log_type)
     
-    if result and recommendations and plot_filename and pie_filename and hist_filename:
+    if plot_filename and pie_filename and hist_filename:
         plot_url = f'/plots/{plot_filename}'
         pie_plot_url = f'/plots/{pie_filename}'
         histogram_url = f'/plots/{hist_filename}'
-        session['result'] = result
-        session['recommendations'] = recommendations
         session['plot_url'] = plot_url
         session['pie_plot_url'] = pie_plot_url
         session['histogram_url'] = histogram_url
         return jsonify(success=True, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
     else:
-        return jsonify(success=False)
+        return jsonify(success=False, error="Analysis failed")
 
 # 로그 분석 결과 조회 API
 @app.route('/get_results', methods=['GET'])
 def get_results():
-    result = session.get('result')
-    recommendations = session.get('recommendations')
     plot_url = session.get('plot_url')
     pie_plot_url = session.get('pie_plot_url')
     histogram_url = session.get('histogram_url')  
     
-    if result and recommendations and plot_url and pie_plot_url and histogram_url:
-        return jsonify(success=True, result=result, error_code_description=error_code_descriptions, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
+    if plot_url and pie_plot_url and histogram_url:
+        return jsonify(success=True, error_code_descriptions=error_code_descriptions, plot_url=plot_url, pie_plot_url=pie_plot_url, histogram_url=histogram_url)
     else:
         return jsonify(success=False)
 
@@ -235,9 +233,13 @@ def analyze_log(file_path, log_type):
     """
 
     # R 코드 실행하여 플롯 파일 생성
-    plot_file = robjects.r(r_plot_code)[0]
-    pie_file = robjects.r(r_pie_code)[0]
-    hist_file = robjects.r(r_hist_code)[0]
+    try:
+        plot_file = robjects.r(r_plot_code)[0]
+        pie_file = robjects.r(r_pie_code)[0]
+        hist_file = robjects.r(r_hist_code)[0]
+    except Exception as e:
+        print(f"Error generating plots: {e}")
+        return None, None, None
 
     # 플롯 파일명을 얻기 위한 처리
     plot_filename = os.path.basename(plot_file)
@@ -265,12 +267,4 @@ def analyze_log(file_path, log_type):
     except Exception as e:
         print(f"Error removing copied plot file: {e}")
 
-    # 가상의 분석 결과 및 추천사항 생성
-    #result = "Analysis result based on log type: " + log_type
-    #recommendations = "Recommendations based on analysis of log type: " + log_type
-
-    #return result, recommendations, plot_filename, pie_filename, hist_filename
-
-# Flask 실행 함수, 지우지 마십시오.
-if __name__ == '__main__':
-    app.run()
+    return plot_filename, pie_filename, hist_filename
