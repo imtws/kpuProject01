@@ -3,9 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('/get_results')
         .then(response => response.json())
         .then(data => {
-            const analysisResultDiv = document.getElementById('analysis-result');
-            const errorCodeDescriptionDiv = document.getElementById('error_code_descriptions');
-            const recommendationsDiv = document.getElementById('recommendations');
+            const errorCodeDescriptionsDiv = document.getElementById('error_code_descriptions');
             const plotImage = document.getElementById('plot-image');
             const histogramImage = document.getElementById('hist-plot-image');
             const piePlotImage = document.getElementById('pie-plot-image');
@@ -13,9 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const errorMessageDiv = document.getElementById('error-message');
 
             if (data.success) {
-                analysisResultDiv.innerHTML = `<p>${data.result}</p>`;
-                errorCodeDescriptionDiv.innerHTML = `<p>${data.error_code_description}</p>`;
-                recommendationsDiv.innerHTML = `<p>${data.recommendations}</p>`;
+                errorCodeDescriptionsDiv.innerHTML = Object.entries(data.error_code_descriptions).map(([code, desc]) => 
+                    `<p><strong>${code}</strong>: ${desc.description} - ${desc.action}</p>`
+                ).join('');
                 plotImage.src = data.plot_url;
                 histogramImage.src = data.histogram_url;
                 piePlotImage.src = data.pie_plot_url;
