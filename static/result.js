@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Fetch results from the server
     fetch('/get_results')
         .then(response => response.json())
         .then(data => {
