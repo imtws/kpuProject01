@@ -277,6 +277,9 @@ def analyze_log(file_path, log_type):
 
     return error_code_info, plot_filename, pie_filename, hist_filename
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv'}
+
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
     app.run()
