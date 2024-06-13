@@ -323,6 +323,11 @@ def upload_file():
         "ip_query_count": ip_query_count
     })
 
+@app.route('/check_session')
+def check_session():
+    # 세션에 저장된 값들을 출력
+    return jsonify(session)
+
 #if __name__ == "__main__":
 #    app.run(debug=True)
 
