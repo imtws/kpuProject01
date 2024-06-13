@@ -280,8 +280,6 @@ def get_plot(filename):
 import pandas as pd
 from flask import Flask, jsonify, request
 
-app = Flask(__name__)
-
 @app.route('/upload', methods=['POST'])
 def upload_file():
     file = request.files['file']
