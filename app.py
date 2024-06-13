@@ -142,7 +142,6 @@ def analyze():
     else:
         return jsonify(success=False, error="Analysis failed")
 
-
 # 로그 분석 결과 조회 API
 @app.route('/get_results', methods=['GET'])
 def get_results():
@@ -156,6 +155,7 @@ def get_results():
     else:
         return jsonify(success=False)
 
+
 # 그래프 파일 API
 @app.route('/plots/<filename>')
 def get_plot(filename):
@@ -164,10 +164,6 @@ def get_plot(filename):
 # 함수 영역
 
 # 허용 파일 검사 함수
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv'}
-
-# 로그 분석 함수
 def analyze_log(file_path, log_type):
     pandas2ri.activate()
     
@@ -180,10 +176,10 @@ def analyze_log(file_path, log_type):
             r_df = robjects.conversion.py2rpy(df)
     except Exception as e:
         print(f"Error converting DataFrame to R DataFrame: {e}")
-        return None, None, None
+        return None, None, None, None
 
-    # 고유한 Code 값을 추출
-    unique_codes = df['Code'].unique().tolist()
+    # 가장 많이 조회된 Code 값을 추출
+    most_common_code = df['Code'].value_counts().idxmax()
 
     # R 라이브러리 및 함수 임포트
     ggplot2 = importr('ggplot2')
@@ -195,7 +191,7 @@ def analyze_log(file_path, log_type):
     # R 코드로 ggplot2 그래프 생성
     r_plot_code = f"""
     library(ggplot2)
-    plot <- ggplot(df, aes(x = factor(Code, levels=c({','.join(map(str, unique_codes))})), y = IP)) + 
+    plot <- ggplot(df, aes(x = factor(Code, levels=c("{most_common_code}")), y = IP)) + 
             geom_point() + 
             theme(
                 legend.text = element_text(size = 5),  # 범례 텍스트 크기
@@ -226,7 +222,7 @@ def analyze_log(file_path, log_type):
     # 히스토그램 생성 코드
     r_hist_code = f"""
     library(ggplot2)
-    hist_plot <- ggplot(df, aes(x = factor(Code, levels=c({','.join(map(str, unique_codes))})))) + 
+    hist_plot <- ggplot(df, aes(x = factor(Code, levels=c("{most_common_code}")))) + 
                 geom_histogram(stat="count", fill = 'blue', color = 'black') + 
                 theme_minimal() + 
                 labs(title = 'Histogram of Codes', x = 'Code', y = 'Frequency')
@@ -269,7 +265,7 @@ def analyze_log(file_path, log_type):
         os.remove(hist_file)
     except Exception as e:
         print(f"Error removing copied plot file: {e}")
-    
+
     # 가장 많이 발생한 에러 코드에 대한 설명과 조치 방법 가져오기
     description = error_code_descriptions.get(str(most_common_code), {}).get('description', 'No description available')
     action = error_code_descriptions.get(str(most_common_code), {}).get('action', 'No action available')
@@ -279,7 +275,7 @@ def analyze_log(file_path, log_type):
         'action': action
     }
 
-    return plot_filename, pie_filename, hist_filename
+    return error_code_info, plot_filename, pie_filename, hist_filename
 
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
