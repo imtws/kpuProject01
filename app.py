@@ -6,6 +6,7 @@ from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 from rpy2.robjects.conversion import localconverter
 import shutil
+import re
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -298,17 +299,15 @@ def get_plot(filename):
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-import re
-
 def extract_ip_addresses_from_file(file_path):
     ip_addresses = []
     try:
         with open(file_path, 'r') as file:
             for line in file:
                 # 정규 표현식을 사용하여 IP 주소 추출
-                ip_match = re.search(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', line)
-                if ip_match:
-                    ip_addresses.append(ip_match.group())
+                ip_matches = re.findall(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', line)
+                if ip_matches:
+                    ip_addresses.extend(ip_matches)
         return ip_addresses, None
     except Exception as e:
         return None, str(e)
