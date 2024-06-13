@@ -224,7 +224,7 @@ def analyze_log(file_path, log_type):
     result = "Analysis result based on log type: " + log_type
     recommendations = "Recommendations based on analysis of log type: " + log_type
 
-    return result, recommendations, plot_filename, 1
+    return result, recommendations, plot_filename, 1, 1
 
 # Flask 실행 함수, 지우지 마십시오.
 if __name__ == '__main__':
