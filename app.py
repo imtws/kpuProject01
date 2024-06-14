@@ -182,6 +182,9 @@ def analyze_log(file_path, log_type):
     # CSV 파일을 Pandas DataFrame으로 읽기
     df = pd.read_csv(file_path)
 
+    # NA 값을 제거하거나 대체
+    df['Code'] = df['Code'].fillna('NA')
+
     try:
         # Pandas DataFrame을 R DataFrame으로 변환
         with localconverter(robjects.default_converter + pandas2ri.converter):
@@ -200,10 +203,14 @@ def analyze_log(file_path, log_type):
     # 예제 데이터 프레임
     robjects.globalenv['df'] = r_df
 
+    # 모든 Code 값을 포함하도록 범주형 변수 정의
+    codes = df['Code'].unique()
+    codes_str = ','.join([f'"{code}"' for code in codes])
+
     # R 코드로 ggplot2 그래프 생성
     r_plot_code = f"""
     library(ggplot2)
-    plot <- ggplot(df, aes(x = factor(Code, levels=c("{most_common_code}")), y = IP)) + 
+    plot <- ggplot(df, aes(x = factor(Code, levels=c({codes_str})), y = IP)) + 
             geom_point() + 
             theme(
                 legend.text = element_text(size = 5),  # 범례 텍스트 크기
@@ -222,7 +229,7 @@ def analyze_log(file_path, log_type):
     r_pie_code = f"""
     library(dplyr)
     pie_data <- df %>% count(Code) %>% mutate(pct = n / sum(n) * 100)
-    pie_plot <- ggplot(pie_data, aes(x = "", y = pct, fill = factor(Code))) +
+    pie_plot <- ggplot(pie_data, aes(x = "", y = pct, fill = factor(Code, levels=c({codes_str})))) +
                 geom_bar(stat = "identity", width = 1) +
                 coord_polar(theta = "y") +
                 theme_void() +
@@ -234,7 +241,7 @@ def analyze_log(file_path, log_type):
     # 히스토그램 생성 코드
     r_hist_code = f"""
     library(ggplot2)
-    hist_plot <- ggplot(df, aes(x = factor(Code, levels=c("{most_common_code}")))) + 
+    hist_plot <- ggplot(df, aes(x = factor(Code, levels=c({codes_str})))) + 
                 geom_histogram(stat="count", fill = 'blue', color = 'black') + 
                 theme_minimal() + 
                 labs(title = 'Histogram of Codes', x = 'Code', y = 'Frequency')
@@ -250,7 +257,7 @@ def analyze_log(file_path, log_type):
         hist_file = robjects.r(r_hist_code)[0]
     except Exception as e:
         print(f"Error generating plots: {e}")
-        return None, None, None
+        return None, None, None, None
 
     # 플롯 파일명을 얻기 위한 처리
     plot_filename = os.path.basename(plot_file)
